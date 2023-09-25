@@ -19,10 +19,17 @@ public class Apriori {
         List<String> buckets;
         Map<String, Integer> supportMap = new HashMap<>();
 
-
+        String curLine;
         // 1st pass
+        while ((curLine = in.readLine()) != null) {
+            buckets = Arrays.asList(curLine.split(" "));
+            uniqueItems.addAll(buckets);
 
-
+            Set<String> temp = new HashSet<>(buckets);
+            for (String item : temp) {
+                supportMap.merge(item, 1, Integer::sum);
+            }
+        }
 
 
         // 2nd pass
