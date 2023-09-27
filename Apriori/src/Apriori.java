@@ -66,9 +66,6 @@ public class Apriori {
                 .filter(e -> e.getValue() >= support).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-
-
-
     }
 }
 
