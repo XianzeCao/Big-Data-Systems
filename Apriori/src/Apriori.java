@@ -62,6 +62,12 @@ public class Apriori {
 
         }
 
+        Map<String, Integer> freqPairs = secondPass.entrySet().stream()
+                .filter(e -> e.getValue() >= support).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
+
+
 
     }
 }
