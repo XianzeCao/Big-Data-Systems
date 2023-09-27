@@ -40,76 +40,38 @@ public class Apriori {
 
         in = new BufferedReader(new FileReader("data/retail.txt"));
 
+        while ((curLine = in.readLine()) != null) {
+            buckets = Arrays.asList(curLine.split(" "));
+
+            for (String item1 : buckets) {
+                int index = buckets.indexOf(item1);
+                for (String item2 : buckets.subList(index + 1, buckets.size())) {
+                    if (item1.equals(item2)) {
+                        continue;
+                    }
+
+                    if (freqItems.containsKey(item1) && freqItems.containsKey(item2)) {
+                        String key = item1 + "," + item2;
+                        secondPass.merge(key, 1, Integer::sum);
+
+                    }
 
 
+                }
+            }
+
+        }
 
 
     }
-
-
 }
 
 
 
-        while((currentLine=in.readLine())!=null){
-        //output.write(currentLine+"\n");
-        buckets=Arrays.asList(currentLine.split(" "));
 
-        for(String item_1:buckets){
 
-        int index=buckets.indexOf(item_1);
 
-        for(String item_2:buckets.subList(index+1,buckets.size())){
-        //skip if 2 items are the same
-        if(item_1.equals(item_2)){
-        continue;
-        }
 
-        //check if each of the items is a frequent item
-        if(frequentItems.containsKey(item_1)&&frequentItems.containsKey(item_2)){
-        String key=item_1+" "+item_2;
-        if(secondPass.containsKey(key)){
-        secondPass.put(key,secondPass.get(key)+1);
-        }else{
-        secondPass.put(key,1);
-        }
 
-        }
 
-        }
 
-        }
-        }
-
-        Hashtable<String, Integer> frequentPairs=new Hashtable<>();
-        secondPass.forEach((k,v)->{
-        if(v>=support){
-        frequentPairs.put(k,v);
-        }
-        });
-
-        //output frequent items to file
-        frequentItems.forEach((k,v)->{
-        try{
-        output.write("Item: "+k+" Frequencies: "+v+"\n");
-        }catch(Exception e){
-        e.printStackTrace();
-        }
-        });
-
-        frequentPairs.forEach((k,v)->{
-        try{
-        output.write("Item: "+k+" Frequencies: "+v+"\n");
-        }catch(Exception e){
-        e.printStackTrace();
-        }
-        });
-
-        output.close();
-        in.close();
-
-        long endTime=System.currentTimeMillis();
-        System.out.println("Datasize: "+datasize+" Support threshold: "+support);
-        System.out.println("Time elapsed: "+(endTime-startTime));
-
-        }
