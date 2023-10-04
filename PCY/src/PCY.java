@@ -18,10 +18,12 @@ public class PCY {
 
         Set<String> uniqueItems = new HashSet<>();
         List<String> buckets;
-        Map<String,Integer> firstBucket = new HashMap<>();
+        Map<String, Integer> firstBucket = new HashMap<>();
         Map<String, Integer> supportMap = new HashMap<>();
 
         String curLine;
+
+        BitSet bitSet = new BitSet(88000);
         // 1st pass
         while ((curLine = in.readLine()) != null) {
             buckets = Arrays.asList(curLine.split(" "));
@@ -33,22 +35,22 @@ public class PCY {
             }
 
             //What PCY improved from Apriori
-            for(String item_1 : buckets){
+            for (String item_1 : buckets) {
 
                 int index = buckets.indexOf(item_1);
 
-                for(String item_2: buckets.subList(index+1,buckets.size())){
+                for (String item_2 : buckets.subList(index + 1, buckets.size())) {
 
-                    if(item_1.equals(item_2)){
+                    if (item_1.equals(item_2)) {
                         continue;
                     }
 
-                    String items = item_1 + " "+ item_2;
+                    String items = item_1 + " " + item_2;
 
-                    if(firstBucket.containsKey(items)){
+                    if (firstBucket.containsKey(items)) {
                         firstBucket.put(items, firstBucket.get(items) + 1);
-                    }else{
-                        firstBucket.put(items,1);
+                    } else {
+                        firstBucket.put(items, 1);
                     }
 
                 }
@@ -57,7 +59,63 @@ public class PCY {
 
         }
 
+        firstBucket.forEach((k, v) -> {
+            if (v >= support) {
+                bitSet.set(hashFunction(k));
+            }
+        });
 
+        //generate 1st sequences
+        Hashtable<String, Integer> frequentItems = new Hashtable<>();
+        supportMap.forEach((k, v) -> {
+            if (v >= support) {
+                frequentItems.put(k, v);
+            }
+        });
+
+        //second pass
+        //Hashtable<String,Integer> secondPass = new Hashtable<>();
+        LinkedHashMap<String, Integer> frequentBucket = new LinkedHashMap<>();
+        in = new BufferedReader(new FileReader("data/retail.txt"));
+
+        while ((curLine = in.readLine()) != null) {
+
+            buckets = Arrays.asList(curLine.split(" "));
+
+            for (String item_1 : buckets) {
+
+                int index = buckets.indexOf(item_1);
+
+                for (String item_2 : buckets.subList(index + 1, buckets.size())) {
+                    //skip if 2 items are the same
+                    if (item_1.equals(item_2)) {
+                        continue;
+                    }
+
+                    String items = item_1 + " " + item_2;
+
+                    //check if the bit vector is set OR not set
+                    if (!bitSet.get(hashFunction(items))) {
+                        continue;
+                    }
+                    if (frequentBucket.containsKey(items)) {
+
+                        frequentBucket.put(items, frequentBucket.get(items) + 1);
+
+                    } else {
+                        frequentBucket.put(items, 1);
+                    }
+
+                }
+
+            }
+        }
+
+
+    }
+
+    public static Integer hashFunction(String key) {
+        return Math.abs(key.hashCode() % datasize);
 
     }
 }
