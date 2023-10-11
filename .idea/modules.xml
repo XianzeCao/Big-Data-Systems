@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Apriori/Apriori.iml" filepath="$PROJECT_DIR$/Apriori/Apriori.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/EECS4415-Big-Data-Systems.iml" filepath="$PROJECT_DIR$/.idea/EECS4415-Big-Data-Systems.iml" />
       <module fileurl="file://$PROJECT_DIR$/PCY/PCY.iml" filepath="$PROJECT_DIR$/PCY/PCY.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SON/SON.iml" filepath="$PROJECT_DIR$/SON/SON.iml" />
     </modules>
   </component>
 </project>
