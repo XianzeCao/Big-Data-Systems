@@ -1,121 +1,84 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 public class PCY {
     private static final double percentageThreshold = 0.1;
+    private static final double percentageThreshold2 = 0.2;
 
-    private static final int datasize = 100000;
 
-    private static final int support = (int) (datasize * percentageThreshold);
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args) throws IOException {
+        // define I/O utility
+        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
+
         long startTime = System.currentTimeMillis();
 
-        BufferedReader in = new BufferedReader(new FileReader("data/retail.txt"));
-        BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
-
-
-        Set<String> uniqueItems = new HashSet<>();
-        List<String> buckets;
-        Map<String, Integer> firstBucket = new HashMap<>();
-        Map<String, Integer> supportMap = new HashMap<>();
-
+        int dataSize = 0;
+        Map<Integer, Integer> supportMap = new HashMap<>();
+        Map<String, Integer> supportMap2 = new HashMap<>();
+//        Set<Integer> uniqueItems;
         String curLine;
-
-        BitSet bitSet = new BitSet(88000);
-        // 1st pass
+        // 1st pass, record the frequency of each item
         while ((curLine = in.readLine()) != null) {
-            buckets = Arrays.asList(curLine.split(" "));
-            uniqueItems.addAll(buckets);
 
-            Set<String> temp = new HashSet<>(buckets);
-            for (String item : temp) {
+            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
+                    .map(Integer::valueOf).collect(Collectors.toList());
+
+            dataSize++;
+
+            for (Integer item : curBasket) {
                 supportMap.merge(item, 1, Integer::sum);
             }
-
-            //What PCY improved from Apriori
-            for (String item_1 : buckets) {
-
-                int index = buckets.indexOf(item_1);
-
-                for (String item_2 : buckets.subList(index + 1, buckets.size())) {
-
-                    if (item_1.equals(item_2)) {
-                        continue;
-                    }
-
-                    String items = item_1 + " " + item_2;
-
-                    if (firstBucket.containsKey(items)) {
-                        firstBucket.put(items, firstBucket.get(items) + 1);
-                    } else {
-                        firstBucket.put(items, 1);
-                    }
-
-                }
-
-            }
-
         }
 
-        firstBucket.forEach((k, v) -> {
-            if (v >= support) {
-                bitSet.set(hashFunction(k));
-            }
-        });
+        int support = (int) (dataSize * percentageThreshold);
 
-        //generate 1st sequences
-        Hashtable<String, Integer> frequentItems = new Hashtable<>();
-        supportMap.forEach((k, v) -> {
-            if (v >= support) {
-                frequentItems.put(k, v);
-            }
-        });
+        // filter out the items that are below threshold
+        Map<Integer, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= support)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        //second pass
-        //Hashtable<String,Integer> secondPass = new Hashtable<>();
-        LinkedHashMap<String, Integer> frequentBucket = new LinkedHashMap<>();
-        in = new BufferedReader(new FileReader("data/retail.txt"));
+
+
+        // 2nd pass
+             in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
-
-            buckets = Arrays.asList(curLine.split(" "));
-
-            for (String item_1 : buckets) {
-
-                int index = buckets.indexOf(item_1);
-
-                for (String item_2 : buckets.subList(index + 1, buckets.size())) {
-                    //skip if 2 items are the same
-                    if (item_1.equals(item_2)) {
-                        continue;
+            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
+                    .map(Integer::valueOf).collect(Collectors.toList());
+            Collections.sort(curBasket);
+            for (int i = 0; i < curBasket.size(); i++) {
+                for (int j = i + 1; j < curBasket.size(); j++) {
+                    Integer item1 = curBasket.get(i);
+                    Integer item2 = curBasket.get(j);
+                    if (freqItems.containsKey(item1) && freqItems.containsKey(item2)) {
+                        String key = item1 + "," + item2;
+                        supportMap2.merge(key, 1, Integer::sum);
                     }
-
-                    String items = item_1 + " " + item_2;
-
-                    //check if the bit vector is set OR not set
-                    if (!bitSet.get(hashFunction(items))) {
-                        continue;
-                    }
-                    if (frequentBucket.containsKey(items)) {
-
-                        frequentBucket.put(items, frequentBucket.get(items) + 1);
-
-                    } else {
-                        frequentBucket.put(items, 1);
-                    }
-
                 }
-
             }
+
         }
 
+        // filter out the items that are below threshold
+        Map<String, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= support)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+        System.out.println(freqItems.size());
+        System.out.println(freqItems2.size());
     }
 
-    public static Integer hashFunction(String key) {
-        return Math.abs(key.hashCode() % datasize);
-
-    }
 }
+
+
+
+
+
+
+
+
+

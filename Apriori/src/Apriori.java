@@ -4,71 +4,74 @@ import java.util.stream.Collectors;
 
 public class Apriori {
     private static final double percentageThreshold = 0.1;
+    private static final double percentageThreshold2 = 0.2;
 
-    private static final int datasize = 100000;
-
-    private static final int support = (int) (datasize * percentageThreshold);
 
     public static void main(String[] args) throws Exception {
 
-
-        BufferedReader in = new BufferedReader(new FileReader("data/retail.txt"));
-        BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
+        // define I/O utility
+        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
 
         long startTime = System.currentTimeMillis();
-        Set<String> uniqueItems = new HashSet<>();
-        List<String> buckets;
-        Map<String, Integer> supportMap = new HashMap<>();
 
+        int dataSize = 0;
+        Map<Integer, Integer> supportMap = new HashMap<>();
+        Map<String, Integer> supportMap2 = new HashMap<>();
+//        Set<Integer> uniqueItems;
         String curLine;
-        // 1st pass
+        // 1st pass, record the frequency of each item
         while ((curLine = in.readLine()) != null) {
-            buckets = Arrays.asList(curLine.split(" "));
-            uniqueItems.addAll(buckets);
 
-            Set<String> temp = new HashSet<>(buckets);
-            for (String item : temp) {
+            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
+                    .map(Integer::valueOf).collect(Collectors.toList());
+
+            dataSize++;
+
+            for (Integer item : curBasket) {
                 supportMap.merge(item, 1, Integer::sum);
             }
         }
 
+        int support = (int) (dataSize * percentageThreshold);
 
-        Map<String, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= support)
+        // filter out the items that are below threshold
+        Map<Integer, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= support)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        // 2nd pass
-        Map<String, Integer> secondPass = new HashMap<>();
 
-        in = new BufferedReader(new FileReader("data/retail.txt"));
+
+
+        // 2nd pass
+             in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
-            buckets = Arrays.asList(curLine.split(" "));
-
-            for (String item1 : buckets) {
-                int index = buckets.indexOf(item1);
-                for (String item2 : buckets.subList(index + 1, buckets.size())) {
-                    if (item1.equals(item2)) {
-                        continue;
-                    }
-
+            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
+                    .map(Integer::valueOf).collect(Collectors.toList());
+            Collections.sort(curBasket);
+            for (int i = 0; i < curBasket.size(); i++) {
+                for (int j = i + 1; j < curBasket.size(); j++) {
+                    Integer item1 = curBasket.get(i);
+                    Integer item2 = curBasket.get(j);
                     if (freqItems.containsKey(item1) && freqItems.containsKey(item2)) {
                         String key = item1 + "," + item2;
-                        secondPass.merge(key, 1, Integer::sum);
-
+                        supportMap2.merge(key, 1, Integer::sum);
                     }
-
-
                 }
             }
 
         }
 
-        Map<String, Integer> freqPairs = secondPass.entrySet().stream()
-                .filter(e -> e.getValue() >= support).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        // filter out the items that are below threshold
+        Map<String, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= support)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-
+        System.out.println(freqItems.size());
+        System.out.println(freqItems2.size());
     }
-}
 
+}
 
 
 
