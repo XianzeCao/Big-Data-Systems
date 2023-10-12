@@ -17,8 +17,8 @@ public class Apriori {
 
 
         // define I/O utility
-//        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
-        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
         //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
 
 
@@ -30,8 +30,8 @@ public class Apriori {
         // 1st pass, record the frequency of each item
         while ((curLine = in.readLine()) != null) {
 
-            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
-                    .map(Integer::valueOf).collect(Collectors.toList());
+            List<Integer> curBasket = Arrays.stream(curLine.split(" "))
+                    .map(Integer::valueOf).toList();
 
             dataSize++;
 
@@ -48,12 +48,12 @@ public class Apriori {
 
 
         // 2nd pass
-//             in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+             in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
-            List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
-                    .map(Integer::valueOf).filter(freqItems::containsKey).collect(Collectors.toList());
+            List<Integer> curBasket = Arrays.stream(curLine.split(" "))
+                    .map(Integer::valueOf).filter(freqItems::containsKey).toList();
 
 
             for (Integer item1 : curBasket) {
@@ -72,7 +72,6 @@ public class Apriori {
         Map<Long, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= support)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        long finishTime = System.currentTimeMillis();
 
         System.out.println(freqItems.size());
         System.out.println(freqItems2.size());
