@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SON {
-    private static final double percentageThreshold = 0.1;
+    private static final double percentageThreshold = 0.01;
     private static final double percentageThreshold2 = 0.2;
 
     private static final int segmentSize = 1000;
@@ -25,12 +25,21 @@ public class SON {
 //        Set<Integer> uniqueItems;
         String curLine;
         // 1st pass, record the frequency of each item
+
+        int lineCount = 0;
         while ((curLine = in.readLine()) != null) {
+
+
 
             List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
                     .map(Integer::valueOf).collect(Collectors.toList());
 
             dataSize++;
+            lineCount++;
+
+            if (lineCount % segmentSize == 0) {
+
+            }
 
             for (Integer item : curBasket) {
                 supportMap.merge(item, 1, Integer::sum);
@@ -51,7 +60,7 @@ public class SON {
 
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.asList(curLine.split(" ")).stream()
-                    .map(Integer::valueOf).collect(Collectors.toList());
+                    .map(Integer::valueOf).filter(freqItems::containsKey).collect(Collectors.toList());
             Collections.sort(curBasket);
             for (int i = 0; i < curBasket.size(); i++) {
                 for (int j = i + 1; j < curBasket.size(); j++) {
