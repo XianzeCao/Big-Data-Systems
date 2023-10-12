@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 public class SON {
     private static final double percentageThreshold = 0.01;
-    private static final double percentageThreshold2 = 0.2;
+//    private static final double percentageThreshold = 0.02;
 
     private static final int segmentSize = 1000;
 
