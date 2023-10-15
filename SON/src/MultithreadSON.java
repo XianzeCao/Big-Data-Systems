@@ -3,13 +3,15 @@ import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MultithreadSON {
     private static final double percentageThreshold = 0.01;
-    private static final double percentageThreshold2 = 0.2;
+    private static final double percentageThreshold2 = 0.02;
 
 
     public static void main(String[] args) throws Exception {
@@ -39,15 +41,14 @@ public class MultithreadSON {
 //        in = new BufferedReader(new FileReader("data/retail.dat"));
         in = new BufferedReader(new FileReader("data/netflix.data"));
 
-        Map<Integer, Integer> supportMap = new HashMap<>();
-        Map<Long, Integer> supportMap2 = new HashMap<>();
-
 
         String curLine;
 
         ExecutorService executor = Executors.newFixedThreadPool(100);
         // 1st pass, record the frequency of each item
-        Set<>
+
+        ConcurrentHashMap<Long, Integer> supportMap = new ConcurrentHashMap<>();
+
         while ((curLine = in.readLine()) != null) {
 
 
@@ -55,17 +56,19 @@ public class MultithreadSON {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))
                     .map(Integer::valueOf).toList();
 
-            Runnable worker = new Worker(curBasket, threshold);
+            Map<Long, Integer> curMap = new HashMap<>();
+            Runnable worker = new Worker(curBasket, threshold, curMap);
+
+
+
             executor.execute(worker);
-
-
+            curMap.forEach((key, value) ->
+                    supportMap.merge(key, value, Integer::sum));
         }
         // Shutdown the executor after tasks are done
         executor.shutdown();
 
         // filter out the items that are below threshold
-        Map<Integer, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
         // covert hashtable to bitmap , since this is a java program the smallest object is byte, so we're using byte instead
@@ -75,19 +78,14 @@ public class MultithreadSON {
 //        in = new BufferedReader(new FileReader("data/retail.dat"));
         in = new BufferedReader(new FileReader("data/netflix.data"));
 
+
+
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))
-                    .map(Integer::valueOf).filter(freqItems::containsKey).toList();
+                    .map(Integer::valueOf).filter(freqItems::containsKey).collect(Collectors.toSet());
 
 
-            for (Integer item1 : curBasket) {
-                for (Integer item2 : curBasket) {
-                    if (item1 >= item2) continue;
-                    Long key = generateKey(item1, item2);
-                    supportMap2.merge(key, 1, Integer::sum);
-
-                }
-            }
+            // verifying that whether each candidate is actually frequent or not
 
 
         }
@@ -106,20 +104,37 @@ public class MultithreadSON {
 
 
     static Long generateKey(int x, int y) {
-        long key = ((long) x << 32) | y;
-        return Long.valueOf(key);
+        return ((long) x << 32) | y;
     }
 
-    class Worker implements Runnable {
+    static class Worker implements Runnable {
 
         List<Integer> curBasket;
 
-        public Worker(List<Integer> curBasket, int threshold) {
+        public Worker(List<Integer> curBasket, int threshold, Map<Long, Integer> candidates) {
             this.curBasket = curBasket;
         }
 
         @Override
         public void run() {
+
+            while ((curLine = in.readLine()) != null) {
+                List<Integer> curBasket = Arrays.stream(curLine.split(" "))
+                        .map(Integer::valueOf).filter(freqItems::containsKey).toList();
+
+
+                for (Integer item1 : curBasket) {
+                    for (Integer item2 : curBasket) {
+                        if (item1 >= item2) continue;
+                        Long key = generateKey(item1, item2);
+                        supportMap2.merge(key, 1, Integer::sum);
+
+                    }
+                }
+
+
+            }
+
 
         }
     }

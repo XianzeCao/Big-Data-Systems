@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Apriori {
-    private static final double percentageThreshold = 0.01;
+    private static final double percentageThreshold = 0.1;
     private static final double percentageThreshold2 = 0.02;
 
 
