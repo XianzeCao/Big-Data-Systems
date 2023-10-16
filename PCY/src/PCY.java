@@ -31,7 +31,7 @@ public class PCY {
 //        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         Map<Integer, Integer> supportMap = new HashMap<>();
-        Map<String, Integer> supportMap2 = new HashMap<>();
+        Map<Long, Integer> supportMap2 = new HashMap<>();
 
 
         String curLine;
@@ -87,7 +87,7 @@ public class PCY {
                     if (item1 >= item2) continue;
                     if (bitmap.get(HashFunction.hash(item1, item2, hashSpace))) {
 
-                        String key = generateKey2(item1, item2);
+                        Long key = generateKey(item1, item2);
 
                         supportMap2.merge(key, 1, Integer::sum);
                     }
@@ -99,7 +99,7 @@ public class PCY {
 
 
         // filter out the items that are below threshold
-        Map<String, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
+        Map<Long, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -111,25 +111,11 @@ public class PCY {
     }
 
     static Long generateKey(int x, int y) {
-        System.out.println("x: " + x);
-        System.out.println("y: " + y);
 
         long key = ((long) x << 32) | y;
 
-        System.out.println("combined : "+ key);
+
         return Long.valueOf(key);
-    }
-
-    static String  generateKey2(int x, int y) {
-        System.out.println("x: " + x);
-        System.out.println("y: " + y);
-
-        String key = x + "," + y;
-
-        System.out.println("combined : "+ key);
-        return key;
-
-
     }
 
 }
