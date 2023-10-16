@@ -15,8 +15,8 @@ public class PCY {
 
         Instant start = Instant.now();
         // define I/O utility
-//        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
-        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
         //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
         int dataSize = 0;
         while (in.readLine() != null) {
@@ -27,15 +27,13 @@ public class PCY {
 
         int[] hashtable = new int[hashSpace];
 
-//        in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+        in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         Map<Integer, Integer> supportMap = new HashMap<>();
-        Map<Long, Integer> supportMap2 = new HashMap<>();
+        Map<String, Integer> supportMap2 = new HashMap<>();
 
-        Map<Integer, Integer> hashedPairs = new HashMap<>();
 
-//        Set<Integer> uniqueItems;
         String curLine;
         // 1st pass, record the frequency of each item
         while ((curLine = in.readLine()) != null) {
@@ -47,7 +45,7 @@ public class PCY {
                 supportMap.merge(item1, 1, Integer::sum);
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
-                    hashtable[HashFunction.hash(item1, item2, dataSize)]++;
+                    hashtable[HashFunction.hash(item1, item2, hashSpace)]++;
                 }
 
             }
@@ -61,11 +59,13 @@ public class PCY {
         BitSet bitmap = new BitSet(hashSpace);
         for (int i = 0; i < hashSpace; i++) {
             if (hashtable[i] >= threshold) {
+
                 bitmap.set(i);
             }
         }
 
         // filter out the items that are below threshold
+
         Map<Integer, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -74,8 +74,8 @@ public class PCY {
 
 
         // 2nd pass
-//        in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+        in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))
@@ -85,8 +85,10 @@ public class PCY {
             for (Integer item1 : curBasket) {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
-                    if (bitmap.get(HashFunction.hash(item1, item2, dataSize))) {
-                        Long key = generateKey(item1, item2);
+                    if (bitmap.get(HashFunction.hash(item1, item2, hashSpace))) {
+
+                        String key = generateKey2(item1, item2);
+
                         supportMap2.merge(key, 1, Integer::sum);
                     }
                 }
@@ -95,8 +97,9 @@ public class PCY {
 
         }
 
+
         // filter out the items that are below threshold
-        Map<Long, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
+        Map<String, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= threshold)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -108,8 +111,25 @@ public class PCY {
     }
 
     static Long generateKey(int x, int y) {
+        System.out.println("x: " + x);
+        System.out.println("y: " + y);
+
         long key = ((long) x << 32) | y;
+
+        System.out.println("combined : "+ key);
         return Long.valueOf(key);
+    }
+
+    static String  generateKey2(int x, int y) {
+        System.out.println("x: " + x);
+        System.out.println("y: " + y);
+
+        String key = x + "," + y;
+
+        System.out.println("combined : "+ key);
+        return key;
+
+
     }
 
 }

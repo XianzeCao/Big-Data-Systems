@@ -7,8 +7,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Apriori {
-    private static final double percentageThreshold = 0.1;
+    private static final double percentageThreshold = 0.01;
     private static final double percentageThreshold2 = 0.02;
+
 
 
     public static void main(String[] args) throws Exception {
@@ -69,6 +70,7 @@ public class Apriori {
         }
 
         // filter out the items that are below threshold
+
         Map<Long, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= support)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -81,7 +83,10 @@ public class Apriori {
     }
 
     static Long generateKey(int x, int y) {
+
+
         long key = ((long) x << 32) | y;
+
         return Long.valueOf(key);
     }
 
