@@ -86,7 +86,7 @@ public class PCY {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
                     if (bitmap.get(HashFunction.hash(item1, item2, hashSpace))) {
-
+                        
                         Long key = generateKey(item1, item2);
 
                         supportMap2.merge(key, 1, Integer::sum);
