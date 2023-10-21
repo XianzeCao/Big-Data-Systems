@@ -75,6 +75,8 @@ public class MultithreadSON {
 //        in = new BufferedReader(new FileReader("data/netflix.data"));
 
 
+        // filter by threshold
+
 
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))

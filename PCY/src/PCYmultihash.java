@@ -15,8 +15,8 @@ public class PCYmultihash {
 
         Instant start = Instant.now();
         // define I/O utility
-//        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
-        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
         //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
         int dataSize = 0;
         while (in.readLine() != null) {
@@ -25,17 +25,17 @@ public class PCYmultihash {
 
         int hashSpace = dataSize * 1000;
 
-        int[] hashtable = new int[hashSpace];
 
-//        in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+        int[] hashtable1 = new int[hashSpace];
+        int[] hashtable2 = new int[hashSpace];
+
+        in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         Map<Integer, Integer> supportMap = new HashMap<>();
         Map<Long, Integer> supportMap2 = new HashMap<>();
 
 
-
-//        Set<Integer> uniqueItems;
         String curLine;
         // 1st pass, record the frequency of each item
         while ((curLine = in.readLine()) != null) {
@@ -47,7 +47,11 @@ public class PCYmultihash {
                 supportMap.merge(item1, 1, Integer::sum);
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
-                    hashtable[HashFunction.hash(item1, item2, dataSize)]++;
+
+                    hashtable1[HashFunction.hash(item1, item2, hashSpace)]++;
+
+                    hashtable2[HashFunction.hash(item1, item2, hashSpace)]++;
+
                 }
 
             }
@@ -55,13 +59,16 @@ public class PCYmultihash {
 
         }
 
-
         int threshold = (int) (dataSize * percentageThreshold);
 
-        BitSet bitmap = new BitSet(hashSpace);
+        BitSet bitmap1 = new BitSet(hashSpace);
+        BitSet bitmap2 = new BitSet(hashSpace);
         for (int i = 0; i < hashSpace; i++) {
-            if (hashtable[i] >= threshold) {
-                bitmap.set(i);
+            if (hashtable1[i] >= threshold) {
+                bitmap1.set(i);
+            }
+            if (hashtable2[i] >= threshold) {
+                bitmap2.set(i);
             }
         }
 
@@ -74,8 +81,8 @@ public class PCYmultihash {
 
 
         // 2nd pass
-//        in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+        in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))
@@ -85,7 +92,10 @@ public class PCYmultihash {
             for (Integer item1 : curBasket) {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
-                    if (bitmap.get(HashFunction.hash(item1, item2, dataSize))) {
+                    if (bitmap1.get(HashFunction.hash(item1, item2, hashSpace))
+                            && bitmap2.get(HashFunction.hash(item1, item2, hashSpace))
+
+                    ) {
                         Long key = generateKey(item1, item2);
                         supportMap2.merge(key, 1, Integer::sum);
                     }
@@ -108,8 +118,7 @@ public class PCYmultihash {
     }
 
     static Long generateKey(int x, int y) {
-        long key = ((long) x << 32) | y;
-        return Long.valueOf(key);
+        return ((long) x << 32) | y;
     }
 
 }
