@@ -33,7 +33,7 @@ public class PCYmultihash {
         Map<Integer, Integer> supportMap = new HashMap<>();
         Map<Long, Integer> supportMap2 = new HashMap<>();
 
-        Map<Integer, Integer> hashedPairs = new HashMap<>();
+
 
 //        Set<Integer> uniqueItems;
         String curLine;

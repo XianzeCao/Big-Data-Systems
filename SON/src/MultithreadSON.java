@@ -68,15 +68,11 @@ public class MultithreadSON {
         // Shutdown the executor after tasks are done
         executor.shutdown();
 
-        // filter out the items that are below threshold
-
-
-        // covert hashtable to bitmap , since this is a java program the smallest object is byte, so we're using byte instead
 
 
         // 2nd pass
-//        in = new BufferedReader(new FileReader("data/retail.dat"));
-        in = new BufferedReader(new FileReader("data/netflix.data"));
+        in = new BufferedReader(new FileReader("data/retail.dat"));
+//        in = new BufferedReader(new FileReader("data/netflix.data"));
 
 
 
