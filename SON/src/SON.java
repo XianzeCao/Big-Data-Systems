@@ -99,11 +99,6 @@ public class SON {
     }
 
 
-    void operate(){
-
-    }
-
-
     static Long generateKey(int x, int y) {
         long key = ((long) x << 32) | y;
         return Long.valueOf(key);

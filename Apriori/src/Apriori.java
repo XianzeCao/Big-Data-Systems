@@ -13,25 +13,27 @@ public class Apriori {
     public static void main(String[] args) throws Exception {
         String file1 = "data/retail.dat";
         String file2 = "data/netflix.data";
+        String outputPrefix = "output/Apriori-out";
+        String suffix = ".txt";
 
         double percentageThreshold1 = 0.01;
         double percentageThreshold2 = 0.02;
 
-        run(file1, percentageThreshold1);
-        run(file1, percentageThreshold2);
+        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
+        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
 
-        run(file2, percentageThreshold1);
-        run(file2, percentageThreshold2);
+        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
+        run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
     }
 
-    static void run(String file, double percentageThreshold) throws Exception {
+    static void run(String file, String outputFile, double percentageThreshold) throws Exception {
         Instant start = Instant.now();
 
 
         // define I/O utility
         BufferedReader in = new BufferedReader(new FileReader(file));
+        BufferedWriter output = new BufferedWriter(new FileWriter(outputFile));
 
-        //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
 
 
         int dataSize = 0;
@@ -86,14 +88,30 @@ public class Apriori {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        System.out.println(freqItems.size());
-        System.out.println(freqItems2.size());
+        output.write("Total number of frequent singletons:" + freqItems.size() + "\n");
+
+        output.write("Total number of frequent pairs:" + freqItems2.size() + "\n");
+
+
         Instant end = Instant.now();
-        System.out.println(Duration.between(start, end).toString()
+        output.write("Time cost:" + Duration.between(start, end).toString()
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase());
+                .toLowerCase()
+                + "\n"
+        );
 
+        freqItems2.forEach((key, value) -> {
+            try {
+                output.write(decomposeKey(key) + "\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+        output.close();
+        in.close();
 
     }
 
@@ -104,6 +122,15 @@ public class Apriori {
 
         return Long.valueOf(key);
     }
+
+    static String decomposeKey(long key) {
+
+        int higher = (int) (key >> 32);
+        long lower = ((int) key);
+
+        return higher + ", " + lower;
+    }
+
 
 }
 

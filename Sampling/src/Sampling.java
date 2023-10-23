@@ -11,13 +11,31 @@ public class Sampling {
 
     public static void main(String[] args) throws Exception {
 
+
+        String file1 = "data/retail.dat";
+        String file2 = "data/netflix.data";
+        String outputPrefix = "output/Sampling-out";
+        String suffix = ".txt";
+
+        double percentageThreshold1 = 0.01;
+        double percentageThreshold2 = 0.02;
+
+        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
+        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
+
+        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
+        run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
+    }
+
+    static void run(String file, String outputFile, double percentageThreshold) throws Exception {
+
         Instant start = Instant.now();
 
 
         // define I/O utility
-//        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
-        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
 
+        BufferedReader in = new BufferedReader(new FileReader(file));
+        BufferedWriter output = new BufferedWriter(new FileWriter(outputFile));
 
         List<String> rawData = new ArrayList<>();
         String curLine;
@@ -28,10 +46,10 @@ public class Sampling {
         int dataSize = rawData.size();
 
 
-        double percentage = 0.3;
-        double support = dataSize * percentageThreshold * percentage;
+        double samplingFactor = 0.3;
+        double support = dataSize * percentageThreshold * samplingFactor;
 
-        int numToSelect = (int) (dataSize * percentage);
+        int numToSelect = (int) (dataSize * samplingFactor);
 
         Collections.shuffle(rawData);
         List<String> selectedData = rawData.subList(0, numToSelect);
@@ -74,16 +92,44 @@ public class Sampling {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        System.out.println(freqItems.size());
-        System.out.println(freqItems2.size());
+        output.write("Total number of frequent singletons:" + freqItems.size() + "\n");
+
+        output.write("Total number of frequent pairs:" + freqItems2.size() + "\n");
+
+
         Instant end = Instant.now();
-        System.out.println(Duration.between(start, end));
+        output.write("Time cost:" + Duration.between(start, end).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase()
+                + "\n"
+        );
+
+        freqItems2.forEach((key, value) -> {
+            try {
+                output.write(decomposeKey(key) + "\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+        output.close();
+        in.close();
 
     }
 
     static Long generateKey(int x, int y) {
         long key = ((long) x << 32) | y;
         return Long.valueOf(key);
+    }
+
+    static String decomposeKey(long key) {
+
+        int higher = (int) (key >> 32);
+        long lower = ((int) key);
+
+        return higher + ", " + lower;
     }
 
 
