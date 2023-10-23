@@ -93,7 +93,7 @@ public class PCYmultihash {
 
 
         // 2nd pass
-        in = new BufferedReader(new FileReader("data/retail.dat"));
+        in = new BufferedReader(new FileReader(file));
 //        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
