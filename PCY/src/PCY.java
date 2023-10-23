@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.time.Duration;
 import java.time.Instant;
@@ -6,16 +7,28 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PCY {
-    private static final double percentageThreshold = 0.01;
-    private static final double percentageThreshold2 = 0.02;
 
 
     public static void main(String[] args) throws Exception {
 
+        String file1 = "data/retail.dat";
+        String file2 = "data/netflix.data";
+
+        double percentageThreshold1 = 0.01;
+        double percentageThreshold2 = 0.02;
+
+        run(file1, percentageThreshold1);
+        run(file1, percentageThreshold2);
+
+        run(file2, percentageThreshold1);
+        run(file2, percentageThreshold2);
+    }
+
+    static void run(String file, double percentageThreshold) throws Exception {
 
         Instant start = Instant.now();
         // define I/O utility
-        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
+        BufferedReader in = new BufferedReader(new FileReader(file));
 //        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
         //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
         int dataSize = 0;
@@ -27,7 +40,7 @@ public class PCY {
 
         int[] hashtable = new int[hashSpace];
 
-        in = new BufferedReader(new FileReader("data/retail.dat"));
+        in = new BufferedReader(new FileReader(file));
 //        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         Map<Integer, Integer> supportMap = new HashMap<>();
@@ -86,7 +99,7 @@ public class PCY {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
                     if (bitmap.get(HashFunction.hash(item1, item2, hashSpace))) {
-                        
+
                         Long key = generateKey(item1, item2);
 
                         supportMap2.merge(key, 1, Integer::sum);
@@ -109,6 +122,7 @@ public class PCY {
         System.out.println(Duration.between(start, end));
 
     }
+
 
     static Long generateKey(int x, int y) {
 

@@ -6,20 +6,31 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Apriori {
-    private static final double percentageThreshold = 0.01;
-    private static final double percentageThreshold2 = 0.02;
 
+public class Apriori {
 
 
     public static void main(String[] args) throws Exception {
+        String file1 = "data/retail.dat";
+        String file2 = "data/netflix.data";
 
+        double percentageThreshold1 = 0.01;
+        double percentageThreshold2 = 0.02;
+
+        run(file1, percentageThreshold1);
+        run(file1, percentageThreshold2);
+
+        run(file2, percentageThreshold1);
+        run(file2, percentageThreshold2);
+    }
+
+    static void run(String file, double percentageThreshold) throws Exception {
         Instant start = Instant.now();
 
 
         // define I/O utility
-        BufferedReader in = new BufferedReader(new FileReader("data/retail.dat"));
-//        BufferedReader in = new BufferedReader(new FileReader("data/netflix.data"));
+        BufferedReader in = new BufferedReader(new FileReader(file));
+
         //  BufferedWriter output = new BufferedWriter(new FileWriter("data/results.txt"));
 
 
@@ -49,7 +60,7 @@ public class Apriori {
 
 
         // 2nd pass
-             in = new BufferedReader(new FileReader("data/retail.dat"));
+        in = new BufferedReader(new FileReader(file));
 //        in = new BufferedReader(new FileReader("data/netflix.data"));
 
         while ((curLine = in.readLine()) != null) {
@@ -78,7 +89,11 @@ public class Apriori {
         System.out.println(freqItems.size());
         System.out.println(freqItems2.size());
         Instant end = Instant.now();
-        System.out.println(Duration.between(start, end));
+        System.out.println(Duration.between(start, end).toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase());
+
 
     }
 
