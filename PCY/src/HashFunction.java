@@ -16,6 +16,20 @@ public class HashFunction {
         return Math.abs((int) hash)%size;
     }
 
+    public static int hash2(int x, int y, int size) {
+        ByteBuffer buffer = ByteBuffer.allocate(8);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(x);
+        buffer.putInt(y);
+        buffer.flip();
+
+        int seed = 5; // Change the seed value as needed
+
+        long hash = murmurHash3(buffer.array(), seed);
+
+        return Math.abs((int) hash)%size;
+    }
+
     private static long murmurHash3(byte[] data, int seed) {
         final long c1 = 0x87c37b91114253d5L;
         final long c2 = 0x4cf5ad432745937fL;

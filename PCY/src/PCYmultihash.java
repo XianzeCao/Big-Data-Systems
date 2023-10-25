@@ -62,7 +62,7 @@ public class PCYmultihash {
 
                     hashtable1[HashFunction.hash(item1, item2, hashSpace)]++;
 
-                    hashtable2[HashFunction.hash(item1, item2, hashSpace)]++;
+                    hashtable2[HashFunction.hash2(item1, item2, hashSpace)]++;
 
                 }
 
@@ -105,7 +105,7 @@ public class PCYmultihash {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
                     if (bitmap1.get(HashFunction.hash(item1, item2, hashSpace))
-                            && bitmap2.get(HashFunction.hash(item1, item2, hashSpace))
+                            && bitmap2.get(HashFunction.hash2(item1, item2, hashSpace))
 
                     ) {
                         Long key = generateKey(item1, item2);

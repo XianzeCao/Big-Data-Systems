@@ -38,7 +38,7 @@ public class SON2 {
 
         int threshold = (int) (dataSize * percentageThreshold);
 
-        int numPartition = 1000;
+        int numPartition = 10;
         int segmentSize = dataSize / numPartition;
 
         int segmentThreshold = threshold / numPartition;
@@ -79,6 +79,9 @@ public class SON2 {
 
         in = new BufferedReader(new FileReader(file));
 
+        Set<Long> seen = new HashSet<>();
+
+
         while ((curLine = in.readLine()) != null) {
             List<Integer> curBasket = Arrays.stream(curLine.split(" "))
                     .map(Integer::valueOf).filter(candidates::contains).toList();
@@ -89,6 +92,12 @@ public class SON2 {
                     if (item1 >= item2) continue;
                     Long key = generateKey(item1, item2);
                     supportMap2.merge(key, 1, Integer::sum);
+                    if (supportMap2.get(key) >= threshold && !seen.contains(key)) {
+                        seen.add(key);
+                        output.write("pair count : " + seen.size() + " items: ");
+                        output.write(decomposeKey(key) + "\n");
+
+                    }
 
                 }
             }
@@ -112,13 +121,13 @@ public class SON2 {
                 + "\n"
         );
 
-        freqItems2.forEach((key, value) -> {
-            try {
-                output.write(decomposeKey(key) + "\n");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+//        freqItems2.forEach((key, value) -> {
+//            try {
+//                output.write(decomposeKey(key) + "\n");
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
 
 
         output.close();
