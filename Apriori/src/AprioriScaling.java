@@ -16,7 +16,7 @@ public class AprioriScaling {
         String outputPrefix = "output/apriori-scaling-out";
         String suffix = ".txt";
 
-        double percentageThreshold = 0.1;
+        double percentageThreshold = 0.01;
 
 
         BufferedReader in = new BufferedReader(new FileReader(file2));

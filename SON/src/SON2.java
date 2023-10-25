@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SON {
+public class SON2 {
 
 
     public static void main(String[] args) throws Exception {
@@ -18,11 +18,11 @@ public class SON {
         double percentageThreshold1 = 0.01;
         double percentageThreshold2 = 0.02;
 
-        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
-        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
-
-        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
-//        run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
+//        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
+//        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
+//
+//        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
+        run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
     }
 
     static void run(String file, String outputFile, double percentageThreshold) throws Exception {
