@@ -17,10 +17,10 @@ public class PCY {
         double percentageThreshold1 = 0.01;
         double percentageThreshold2 = 0.02;
 
-        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
-        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
-
-        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
+//        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
+//        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
+//
+//        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
         run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
     }
 

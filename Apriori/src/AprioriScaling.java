@@ -1,75 +1,81 @@
 import java.io.*;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+public class AprioriScaling {
 
-public class Apriori {
 
 
     public static void main(String[] args) throws Exception {
+
+
         String file1 = "data/retail.dat";
         String file2 = "data/netflix.data";
-        String outputPrefix = "output/Apriori-out";
+        String outputPrefix = "output/apriori-scaling-out";
         String suffix = ".txt";
 
-        double percentageThreshold1 = 0.01;
-        double percentageThreshold2 = 0.02;
+        double percentageThreshold = 0.1;
+
+
+        BufferedReader in = new BufferedReader(new FileReader(file2));
+
+
+        List<String> rawData = new ArrayList<>();
+        String curLine;
+        while ((curLine = in.readLine()) != null) {
+            rawData.add(curLine);
+
+        }
+        int dataSize = rawData.size();
 
 //        run(file1, outputPrefix + 1 + suffix, percentageThreshold1);
 //        run(file1, outputPrefix + 2 + suffix, percentageThreshold2);
 //
 //        run(file2, outputPrefix + 3 + suffix, percentageThreshold1);
-        run(file2, outputPrefix + 4 + suffix, percentageThreshold2);
+        run(file2, outputPrefix + "02" + suffix, rawData, percentageThreshold, 0.2, dataSize);
+        run(file2, outputPrefix + "04" + suffix, rawData, percentageThreshold, 0.4, dataSize);
+        run(file2, outputPrefix + "06" + suffix, rawData, percentageThreshold, 0.6, dataSize);
+        run(file2, outputPrefix + "08" + suffix, rawData, percentageThreshold, 0.8, dataSize);
     }
 
-    static void run(String file, String outputFile, double percentageThreshold) throws Exception {
+    static void run(String file, String outputFile, List<String> rawData, double percentageThreshold, double subsetPercentage, int dataSize) throws Exception {
+
         Instant start = Instant.now();
 
 
-        // define I/O utility
-        BufferedReader in = new BufferedReader(new FileReader(file));
+        int numToSelect = (int) (dataSize * subsetPercentage);
+
         BufferedWriter output = new BufferedWriter(new FileWriter(outputFile));
 
 
+        double support = dataSize * percentageThreshold;
 
-        int dataSize = 0;
+
+        List<String> selectedData = rawData.subList(0, numToSelect);
+
+
         Map<Integer, Integer> supportMap = new HashMap<>();
         Map<Long, Integer> supportMap2 = new HashMap<>();
-//        Set<Integer> uniqueItems;
-        String curLine;
-        // 1st pass, record the frequency of each item
-        while ((curLine = in.readLine()) != null) {
 
-            List<Integer> curBasket = Arrays.stream(curLine.split(" "))
+
+        for (String line : selectedData) {
+            List<Integer> curBasket = Arrays.stream(line.split(" "))
                     .map(Integer::valueOf).toList();
-
-            dataSize++;
-
             for (Integer item : curBasket) {
                 supportMap.merge(item, 1, Integer::sum);
             }
         }
 
-        int support = (int) (dataSize * percentageThreshold);
 
-        // filter out the items that are below threshold
         Map<Integer, Integer> freqItems = supportMap.entrySet().stream().filter(entry -> entry.getValue() >= support)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        // 2nd pass
-        in = new BufferedReader(new FileReader(file));
-//        in = new BufferedReader(new FileReader("data/netflix.data"));
-
-        while ((curLine = in.readLine()) != null) {
-            List<Integer> curBasket = Arrays.stream(curLine.split(" "))
+        for (String line : selectedData) {
+            List<Integer> curBasket = Arrays.stream(line.split(" "))
                     .map(Integer::valueOf).filter(freqItems::containsKey).toList();
-
-
             for (Integer item1 : curBasket) {
                 for (Integer item2 : curBasket) {
                     if (item1 >= item2) continue;
@@ -83,7 +89,6 @@ public class Apriori {
         }
 
         // filter out the items that are below threshold
-
         Map<Long, Integer> freqItems2 = supportMap2.entrySet().stream().filter(entry -> entry.getValue() >= support)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -101,25 +106,13 @@ public class Apriori {
                 + "\n"
         );
 
-        freqItems2.forEach((key, value) -> {
-            try {
-                output.write(decomposeKey(key) + "\n");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
 
         output.close();
-        in.close();
 
     }
 
     static Long generateKey(int x, int y) {
-
-
         long key = ((long) x << 32) | y;
-
         return Long.valueOf(key);
     }
 
